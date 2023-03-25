@@ -46,6 +46,26 @@ namespace RepositoryLayer.Migrations
                     b.ToTable("Books");
                 });
 
+            modelBuilder.Entity("DomainLayer.Models.Order", b =>
+                {
+                    b.Property<long>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("OrderId"));
+
+                    b.Property<long>("BookId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("OrderId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("DomainLayer.Models.User", b =>
                 {
                     b.Property<long>("UserId")

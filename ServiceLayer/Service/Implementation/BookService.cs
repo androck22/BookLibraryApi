@@ -1,7 +1,5 @@
 ﻿using DomainLayer.Models;
 using RepositoryLayer;
-using ServiceLayer.Service.Contract;
-using ServiceLayer.Service.UoW;
 
 namespace ServiceLayer.Service.Implementation
 {

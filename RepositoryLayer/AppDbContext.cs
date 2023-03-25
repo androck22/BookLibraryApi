@@ -7,10 +7,12 @@ namespace RepositoryLayer
     {
         public AppDbContext(DbContextOptions<AppDbContext> con) : base(con)
         {
-
+            
         }
 
         public DbSet<User> Users { get; set; }
         public DbSet<Book> Books { get; set; }
+        public DbSet<Order> Orders { get; set; }
+
     }
 }

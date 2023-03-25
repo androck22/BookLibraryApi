@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DomainLayer.Models
+namespace DomainLayer.DTO
 {
-    public class UserProfile
+    public class AddOrderDto
     {
+        public long BookId { get; set; }
+
     }
 }
