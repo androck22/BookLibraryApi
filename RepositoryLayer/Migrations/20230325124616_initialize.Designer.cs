@@ -12,7 +12,7 @@ using RepositoryLayer;
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230325074631_initialize")]
+    [Migration("20230325124616_initialize")]
     partial class initialize
     {
         /// <inheritdoc />

@@ -1,14 +1,18 @@
+using DomainLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer;
-using ServiceLayer.Service.Contract;
 using ServiceLayer.Service.Implementation;
+using WebAPI_Layer.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+
 // Add services to the container.
-builder.Services.AddDbContext<AppDbContext>(con => con.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IUser, UserService>();
-builder.Services.AddScoped<IBook, BookService>();
+builder.Services.AddDbContext<AppDbContext>(con => con.UseSqlServer(connection))
+    .AddUnitOfWork()
+    .AddCustomRepository<Book, BookService>()
+    .AddCustomRepository<User, UserService>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -1,33 +1,31 @@
 ﻿using DomainLayer.Models;
 using RepositoryLayer;
 using ServiceLayer.Service.Contract;
+using ServiceLayer.Service.UoW;
 
 namespace ServiceLayer.Service.Implementation
 {
-    public class BookService : IBook
+    public class BookService : Repository<Book>
     {
-        private readonly AppDbContext _dbContext;
-
-        public BookService(AppDbContext dbContext)
+        public BookService(AppDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
         }
-        public List<Book> GetAllBooks()
+
+        public IEnumerable<Book> GetAllBooks()
         {
-            return _dbContext.Books.ToList();
+            return Set.AsEnumerable();
         }
 
         public Book GetBookById(long id)
         {
-            return _dbContext.Books.Where(b => b.BookId == id).FirstOrDefault();
+            return Set.AsEnumerable().Where(b => b.BookId == id).FirstOrDefault();
         }
 
         public string AddBook(Book book)
         {
             try
             {
-                _dbContext.Books.Add(book);
-                SaveChanges();
+                Set.Add(book);
 
                 return "Success";
             }
@@ -41,15 +39,14 @@ namespace ServiceLayer.Service.Implementation
         {
             try
             {
-                var bookValue = _dbContext.Books.Find(book.BookId);
+                var bookValue = Set.Find(book.BookId);
 
                 if (bookValue != null)
                 {
                     bookValue.Title = book.Title;
                     bookValue.Author = book.Author;
                     bookValue.Price = book.Price;
-                    _dbContext.Books.Update(bookValue);
-                    SaveChanges();
+                    Set.Update(bookValue);
                     return "Successfully Updated";
                 }
                 else
@@ -68,9 +65,8 @@ namespace ServiceLayer.Service.Implementation
         {
             try
             {
-                var book = _dbContext.Books.Where(b => b.BookId == id).FirstOrDefault();
-                _dbContext.Books.Remove(book);
-                SaveChanges();
+                var book = Set.Where(b => b.BookId == id).FirstOrDefault();
+                Set.Remove(book);
 
                 return "Successfully Removed";
             }
@@ -78,11 +74,6 @@ namespace ServiceLayer.Service.Implementation
             {
                 return ex.Message;
             }
-        }
-
-        public void SaveChanges()
-        {
-            _dbContext.SaveChanges();
         }
     }
 }

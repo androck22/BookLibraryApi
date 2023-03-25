@@ -1,6 +1,8 @@
 ﻿using DomainLayer.Models;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Service.Contract;
+using ServiceLayer.Service.Implementation;
+using ServiceLayer.Service.UoW;
 
 namespace WebAPI_Layer.Controllers
 {
@@ -8,44 +10,60 @@ namespace WebAPI_Layer.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUser _user;
+        private IUnitOfWork _unitOfWork;
 
-        public UserController(IUser user)
+        public UserController(IUnitOfWork unitOfWork)
         {
-            _user = user;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         [Route("getall")]
-        public IActionResult GetAllUsers()
+        public async Task<IEnumerable<User>> GetAllUsers()
         {
-            var response = _user.GetAllUsers();
-            return Ok(response);
+            var repository = _unitOfWork.GetRepository<User>() as UserService;
+
+            return await Task.Run(() => repository.GetAllUsers());
         }
 
         [HttpGet]
         [Route("get")]
-        public IActionResult GetUser(int id)
+        public async Task<User> GetUser(int id)
         {
-            return Ok(_user.GetUserById(id));
+            var repository = _unitOfWork.GetRepository<User>() as UserService;
+
+            return await Task.Run(() => repository.GetUserById(id));
         }
 
         [HttpPost("add")]
-        public IActionResult AddUser(User user)
+        public async Task AddUser(User user)
         {
-            return Ok(_user.AddUser(user));
+            var repository = _unitOfWork.GetRepository<User>() as UserService;
+
+
+            await Task.Run(() => repository.AddUser(user));
+
+            _unitOfWork.SaveChanges();
         }
 
         [HttpPut("edit")]
-        public IActionResult UpdateUser(User user)
+        public async Task UpdateUser(User user)
         {
-            return Ok(_user.UpdateUser(user));
+            var repository = _unitOfWork.GetRepository<User>() as UserService;
+
+
+            await Task.Run(() => repository.UpdateUser(user));
+
+            _unitOfWork.SaveChanges();
         }
 
         [HttpDelete]
-        public IActionResult DeleteUser(long id)
+        public async Task DeleteUser(long id)
         {
-            return Ok(_user.RemoveUser(id));
+            var repository = _unitOfWork.GetRepository<User>() as UserService;
+
+            await Task.Run(() => repository.RemoveUser(id));
+            _unitOfWork.SaveChanges();
         }
     }
 }

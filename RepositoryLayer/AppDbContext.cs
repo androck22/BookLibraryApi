@@ -5,7 +5,7 @@ namespace RepositoryLayer
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions con) : base(con)
+        public AppDbContext(DbContextOptions<AppDbContext> con) : base(con)
         {
 
         }

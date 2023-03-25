@@ -1,6 +1,8 @@
 ﻿using DomainLayer.Models;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Service.Contract;
+using ServiceLayer.Service.Implementation;
+using ServiceLayer.Service.UoW;
 
 namespace WebAPI_Layer.Controllers
 {
@@ -8,44 +10,60 @@ namespace WebAPI_Layer.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private readonly IBook _book;
+        private IUnitOfWork _unitOfWork;
 
-        public BookController(IBook book)
+        public BookController(IUnitOfWork unitOfWork)
         {
-            _book = book;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         [Route("getall")]
-        public IActionResult GetAllBooks()
+        public async Task<IEnumerable<Book>> GetAllBooks()
         {
-            var response = _book.GetAllBooks();
-            return Ok(response);
+            var repository = _unitOfWork.GetRepository<Book>() as BookService;
+
+            return await Task.Run(() => repository.GetAllBooks());
         }
 
         [HttpGet]
         [Route("get")]
-        public IActionResult GetBook(int id)
+        public async Task<Book> GetBook(int id)
         {
-            return Ok(_book.GetBookById(id));
+            var repository = _unitOfWork.GetRepository<Book>() as BookService;
+
+            return await Task.Run(() => repository.GetBookById(id));
         }
 
         [HttpPost("add")]
-        public IActionResult AddBook(Book book)
+        public async Task AddBook(Book book)
         {
-            return Ok(_book.AddBook(book));
+            var repository = _unitOfWork.GetRepository<Book>() as BookService;
+
+
+            await Task.Run(() => repository.AddBook(book));
+
+            _unitOfWork.SaveChanges();
         }
 
         [HttpPut("edit")]
-        public IActionResult UpdateBook(Book book)
+        public async Task UpdateBook(Book book)
         {
-            return Ok(_book.UpdateBook(book));
+            var repository = _unitOfWork.GetRepository<Book>() as BookService;
+
+
+            await Task.Run(() => repository.UpdateBook(book));
+
+            _unitOfWork.SaveChanges();
         }
 
         [HttpDelete]
-        public IActionResult DeleteBook(long id)
+        public async Task DeleteBook(long id)
         {
-            return Ok(_book.RemoveBook(id));
+            var repository = _unitOfWork.GetRepository<Book>() as BookService;
+
+            await Task.Run(() => repository.RemoveBook(id));
+            _unitOfWork.SaveChanges();
         }
     }
 }

@@ -1,33 +1,31 @@
 ﻿using DomainLayer.Models;
 using RepositoryLayer;
 using ServiceLayer.Service.Contract;
+using System.Collections.Generic;
 
 namespace ServiceLayer.Service.Implementation
 {
-    public class UserService : IUser
+    public class UserService : Repository<User>
     {
-        private readonly AppDbContext _dbContext;
-
-        public UserService(AppDbContext dbContext)
+        public UserService(AppDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
         }
-        public List<User> GetAllUsers()
+
+        public IEnumerable<User> GetAllUsers()
         {
-            return _dbContext.Users.ToList();
+            return Set.AsEnumerable();
         }
 
         public User GetUserById(long id)
         {
-            return _dbContext.Users.Where(u => u.UserId == id).FirstOrDefault();
+            return Set.AsEnumerable().Where(u => u.UserId == id).FirstOrDefault();
         }
 
         public string AddUser(User user)
         {
             try
             {
-                _dbContext.Users.Add(user);
-                SaveChanges();
+                Set.Add(user);
 
                 return "Success";
             }
@@ -41,15 +39,14 @@ namespace ServiceLayer.Service.Implementation
         {
             try
             {
-                var userValue = _dbContext.Users.Find(user.UserId);
+                var userValue = Set.Find(user.UserId);
 
                 if (userValue != null)
                 {
                     userValue.UserName = user.UserName;
                     userValue.UserPhone = user.UserPhone;
                     userValue.UserEmail = user.UserEmail;
-                    _dbContext.Users.Update(userValue);
-                    SaveChanges();
+                    Set.Update(userValue);
                     return "Successfully Updated";
                 }
                 else
@@ -68,9 +65,8 @@ namespace ServiceLayer.Service.Implementation
         {
             try
             {
-                var user = _dbContext.Users.Where(u => u.UserId == id).FirstOrDefault();
-                _dbContext.Users.Remove(user);
-                SaveChanges();
+                var user = Set.Where(u => u.UserId == id).FirstOrDefault();
+                Set.Remove(user);
 
                 return "Successfully Removed";
             }
@@ -78,11 +74,6 @@ namespace ServiceLayer.Service.Implementation
             {
                 return ex.Message;
             }
-        }
-
-        public void SaveChanges()
-        {
-            _dbContext.SaveChanges();
         }
     }
 }
