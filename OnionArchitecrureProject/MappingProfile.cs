@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using DomainLayer.DTO;
+using DomainLayer.DTO.BookDtos;
+using DomainLayer.DTO.OrderDtos;
 using DomainLayer.Models;
 
 namespace WebAPI_Layer

@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace DomainLayer.DTO
+﻿namespace DomainLayer.DTO.OrderDtos
 {
     public class OrderDto
     {
-        [Key]
         public long OrderId { get; set; }
         public string Description { get; set; }
+        public DateTime DateOfOrder { get; set; }
         public long BookId { get; set; }
     }
 }

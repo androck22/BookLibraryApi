@@ -12,7 +12,7 @@ using RepositoryLayer;
 namespace RepositoryLayer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230325194045_Add_Order_Model")]
+    [Migration("20230325214221_Add_Order_Model")]
     partial class Add_Order_Model
     {
         /// <inheritdoc />
@@ -35,14 +35,21 @@ namespace RepositoryLayer.Migrations
 
                     b.Property<string>("Author")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("Macro Code")
+                        .HasColumnName("BookAuthor");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("BookPrice");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("Macro Code")
+                        .HasColumnName("BookTitle");
 
                     b.HasKey("BookId");
 
@@ -58,11 +65,20 @@ namespace RepositoryLayer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("OrderId"));
 
                     b.Property<long>("BookId")
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("OrderBookId");
+
+                    b.Property<DateTime>("DateOfOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("date")
+                        .HasDefaultValueSql("(getdate())");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("nvarchar(max)")
+                        .HasDefaultValue("Macro Code")
+                        .HasColumnName("DescriptionOrder");
 
                     b.HasKey("OrderId");
 

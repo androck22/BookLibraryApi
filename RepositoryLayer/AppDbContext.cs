@@ -1,4 +1,5 @@
-﻿using DomainLayer.Models;
+﻿using DomainLayer.DTO.BookDtos;
+using DomainLayer.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace RepositoryLayer
@@ -14,5 +15,9 @@ namespace RepositoryLayer
         public DbSet<Book> Books { get; set; }
         public DbSet<Order> Orders { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            FluentAPIConfigurations.FluentAPIConfig(modelBuilder);
+        }
     }
 }

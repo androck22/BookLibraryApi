@@ -5,14 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DomainLayer.DTO
+namespace DomainLayer.DTO.OrderDtos
 {
-    public class AllBooksDto
+    public class AllOrdersDto
     {
-        [Key]
+        public long OrderId { get; set; }
+        public string Description { get; set; }
+        public DateTime DateOfOrder { get; set; }
         public long BookId { get; set; }
-        public string Title { get; set; }
-        public string Author { get; set; }
-        public decimal Price { get; set; }
     }
 }

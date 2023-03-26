@@ -17,9 +17,9 @@ namespace RepositoryLayer.Migrations
                 {
                     BookId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    BookTitle = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Macro Code"),
+                    BookAuthor = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Macro Code"),
+                    BookPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -32,8 +32,9 @@ namespace RepositoryLayer.Migrations
                 {
                     OrderId = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BookId = table.Column<long>(type: "bigint", nullable: false)
+                    DescriptionOrder = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "Macro Code"),
+                    DateOfOrder = table.Column<DateTime>(type: "date", nullable: false, defaultValueSql: "(getdate())"),
+                    OrderBookId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {

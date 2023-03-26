@@ -5,11 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DomainLayer.DTO
+namespace DomainLayer.DTO.BookDtos
 {
-    public class EditBookDto
+    public class AllBooksDto
     {
-        [Key]
         public long BookId { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }

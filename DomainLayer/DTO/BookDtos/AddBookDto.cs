@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DomainLayer.DTO
+namespace DomainLayer.DTO.BookDtos
 {
     public class AddBookDto
     {

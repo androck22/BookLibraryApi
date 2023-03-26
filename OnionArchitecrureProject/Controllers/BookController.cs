@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DomainLayer.DTO;
+using DomainLayer.DTO.BookDtos;
 using DomainLayer.Models;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Service.Contract;
