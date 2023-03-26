@@ -13,16 +13,18 @@ namespace WebAPI_Layer.Controllers
     {
         private IMapper _mapper;
         private IUnitOfWork _unitOfWork;
+        private readonly ILogger<BookController> _logger;
 
-        public OrderController(IMapper mapper, IUnitOfWork unitOfWork)
+        public OrderController(IMapper mapper, IUnitOfWork unitOfWork, ILogger<BookController> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
         [Route("getall")]
-        public async Task<List<AllOrdersDto>> GetAllOrders()
+        public async Task<IActionResult> GetAllOrders()
         {
             var repository = _unitOfWork.GetRepository<Order>() as OrderService;
 
@@ -30,12 +32,14 @@ namespace WebAPI_Layer.Controllers
 
             var request = _mapper.Map<List<Order>, List<AllOrdersDto>>(orders.ToList());
 
-            return request;
+            _logger.LogDebug("Произведена выборка всех заказов");
+
+            return StatusCode(200, request);
         }
 
         [HttpGet]
         [Route("get")]
-        public async Task<OrderDto> GetOrder(int id)
+        public async Task<IActionResult> GetOrder(int id)
         {
             var repository = _unitOfWork.GetRepository<Order>() as OrderService;
 
@@ -43,16 +47,24 @@ namespace WebAPI_Layer.Controllers
 
             var request = _mapper.Map<Order, OrderDto>(order);
 
-            return request;
+            _logger.LogDebug("Выборка прошла успешно. Выбран заказ с id: " + order.OrderId);
+
+            return StatusCode(200, request);
         }
 
         [HttpPost("add")]
-        public async Task AddOrder(AddOrderDto addOrder)
+        public async Task<IActionResult> AddOrder(AddOrderDto addOrder)
         {
             var orderRep = _unitOfWork.GetRepository<Order>() as OrderService;
             var bookRep = _unitOfWork.GetRepository<Book>() as BookService;
 
             var book = await Task.Run(() => bookRep.GetBookById(addOrder.BookId));
+
+            if (book == null)
+            {
+                _logger.LogError($"Ошибка: Книга с id: {addOrder.BookId} не найдена. Проверьте корректность ввода!");
+                return StatusCode(400, $"Ошибка: Книга с id: {addOrder.BookId} не найдена. Проверьте корректность ввода!");
+            }
 
             var newOrder = new Order()
             {
@@ -64,6 +76,10 @@ namespace WebAPI_Layer.Controllers
             await Task.Run(() => orderRep.AddOrder(newOrder));
 
             _unitOfWork.SaveChanges();
+
+            _logger.LogDebug($"Заказ на книгу: {book.Author} - {book.Title} : {DateTime.Now.ToShortDateString()} добвлен успешно.");
+
+            return StatusCode(200, $"Заказ на книгу: {book.Author} - {book.Title} : {DateTime.Now.ToShortDateString()} добвлен успешно.");
         }
 
         //[HttpPut("edit")]
