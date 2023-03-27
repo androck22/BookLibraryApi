@@ -2,15 +2,14 @@
 using DomainLayer.DTO.BookDtos;
 using DomainLayer.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using RepositoryLayer.Migrations;
-using ServiceLayer.Service.Contract;
 using ServiceLayer.Service.Implementation;
 using ServiceLayer.Service.UoW;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebAPI_Layer.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class BookController : ControllerBase
     {
@@ -33,7 +32,11 @@ namespace WebAPI_Layer.Controllers
 
             var books = await Task.Run(() => repository.GetAllBooks());
 
-            var request = _mapper.Map<List<Book>, List<AllBooksDto>>(books.ToList());
+            var request = new AllBooksDto
+            {
+                BookAmount = books.Count(),
+                Books = _mapper.Map<List<Book>, List<BookView>>(books.ToList())
+            };
 
             _logger.LogDebug("Произведена выборка всех книг");
 
@@ -108,9 +111,9 @@ namespace WebAPI_Layer.Controllers
 
             _unitOfWork.SaveChanges();
 
-            _logger.LogDebug($"Книга с id: {id} успешно удалена из библиотеки.");
+            _logger.LogDebug($"Книга: {book.Title} успешно удалена из библиотеки.");
 
-            return StatusCode(200, $"Книга с id: {id} успешно удалена из библиотеки.");
+            return StatusCode(200, $"Книга: {book.Title} успешно удалена из библиотеки.");
         }
     }
 }

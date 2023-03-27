@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DomainLayer.DTO.BookDtos;
 using DomainLayer.DTO.OrderDtos;
+using DomainLayer.DTO.UserDtos;
 using DomainLayer.Models;
 
 namespace WebAPI_Layer
@@ -9,14 +10,18 @@ namespace WebAPI_Layer
     {
         public MappingProfile()
         {
-            CreateMap<Book, AllBooksDto>();
+            CreateMap<Book, BookView>();
             CreateMap<Book, BookDto>();
             CreateMap<AddBookDto, Book>();
             CreateMap<EditBookDto, Book>();
 
-            CreateMap<Order, AllOrdersDto>();
+            CreateMap<Order, OrderView>();
             CreateMap<Order, OrderDto>();
             CreateMap<AddOrderDto, Order>();
+
+            CreateMap<ApplicationUser, UserView>();
+            CreateMap<ApplicationUser, GetUserDto>();
+            CreateMap<UpdateUserDto, ApplicationUser>();
         }
     }
 }

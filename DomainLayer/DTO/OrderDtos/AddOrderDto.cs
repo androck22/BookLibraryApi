@@ -9,6 +9,7 @@ namespace DomainLayer.DTO.OrderDtos
     public class AddOrderDto
     {
         public long BookId { get; set; }
+        public string UserEmail { get; set; }
 
     }
 }

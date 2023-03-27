@@ -1,69 +1,99 @@
-﻿using DomainLayer.Models;
+﻿using AutoMapper;
+using DomainLayer.DTO.UserDtos;
+using DomainLayer.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ServiceLayer.Service.Contract;
-using ServiceLayer.Service.Implementation;
-using ServiceLayer.Service.UoW;
 
 namespace WebAPI_Layer.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IUnitOfWork _unitOfWork;
+        private IMapper _mapper;
+        private readonly ILogger<UserController> _logger;
+        UserManager<ApplicationUser> _userManager;
+        SignInManager<ApplicationUser> _signInManager;
+        RoleManager<IdentityRole> _roleManager;
 
-        public UserController(IUnitOfWork unitOfWork)
+        public UserController(IMapper mapper, ILogger<UserController> logger, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RoleManager<IdentityRole> roleManager)
         {
-            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            _logger = logger;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         [HttpGet]
         [Route("getall")]
-        public async Task<IEnumerable<User>> GetAllUsers()
+        public IActionResult GetAllUsers()
         {
-            var repository = _unitOfWork.GetRepository<User>() as UserService;
+            var users = _userManager.Users.ToList();
 
-            return await Task.Run(() => repository.GetAllUsers());
+            var request = new AllUsersDto
+            {
+                UserAmount = users.Count,
+                Users = _mapper.Map<List<ApplicationUser>, List<UserView>>(users)
+            };
+
+            _logger.LogDebug("Произведена выборка всех пользователей");
+
+            return StatusCode(200, request);
         }
 
         [HttpGet]
         [Route("get")]
-        public async Task<User> GetUser(int id)
+        public async Task<IActionResult> GetUser(string email)
         {
-            var repository = _unitOfWork.GetRepository<User>() as UserService;
+            var user = await _userManager.FindByEmailAsync(email);
 
-            return await Task.Run(() => repository.GetUserById(id));
+            if (user == null)
+            {
+                _logger.LogError($"Ошибка: Пользователь с данным id не найден. Проверьте корректность ввода!");
+                return StatusCode(400, $"Ошибка: Пользователь с данным id не найден. Проверьте корректность ввода!");
+            }
+
+            var request = _mapper.Map<ApplicationUser, GetUserDto>(user);
+
+            return StatusCode(200, request);
         }
 
-        [HttpPost("add")]
-        public async Task AddUser(User user)
+        [HttpPatch("edit")]
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserDto model)
         {
-            var repository = _unitOfWork.GetRepository<User>() as UserService;
+            ApplicationUser applicationUser = await _userManager.FindByEmailAsync(model.Email);
+            if (applicationUser == null)
+            {
+                _logger.LogError($"Ошибка: Пользователь: {model.Email} не зарегестрирован. Сначало пройдите регистрацию!");
+                return StatusCode(400, $"Ошибка: Пользователь: {model.Email} не зарегестрирован. Сначало пройдите регистрацию!");
+            }
 
+            applicationUser.FirstName = model.FirstName;
+            applicationUser.LastName = model.LastName;
+            applicationUser.Email = model.Email;
+            applicationUser.UserName = model.Email;
 
-            await Task.Run(() => repository.AddUser(user));
+            await _userManager.UpdateAsync(applicationUser);
 
-            _unitOfWork.SaveChanges();
+            return StatusCode(200, $"Информация о пользователе: {model.FirstName} {model.LastName}, обновлена!");
         }
 
-        [HttpPut("edit")]
-        public async Task UpdateUser(User user)
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteUser(string email)
         {
-            var repository = _unitOfWork.GetRepository<User>() as UserService;
+            ApplicationUser applicationUser = await _userManager.FindByEmailAsync(email);
+            if (applicationUser == null)
+            {
+                _logger.LogError($"Ошибка: Пользователь {applicationUser.FirstName} {applicationUser.LastName} не существует!");
+                return StatusCode(400, $"Ошибка: Пользователь {applicationUser.FirstName} {applicationUser.LastName} не существует!");
+            }
 
+            await _userManager.DeleteAsync(applicationUser);
 
-            await Task.Run(() => repository.UpdateUser(user));
-
-            _unitOfWork.SaveChanges();
-        }
-
-        [HttpDelete]
-        public async Task DeleteUser(long id)
-        {
-            var repository = _unitOfWork.GetRepository<User>() as UserService;
-
-            await Task.Run(() => repository.RemoveUser(id));
-            _unitOfWork.SaveChanges();
+            return StatusCode(200, $"Пользователь: {applicationUser.FirstName} {applicationUser.LastName} удален!");
         }
     }
 }
